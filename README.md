@@ -4,12 +4,9 @@ A web application that processes AI-generated images to make them undetectable b
 
 ## Features
 
-- 🖼️ **Image Processing**: Advanced filtering algorithms to modify AI-generated images
-- ⚡ **Real-time Processing**: Fast image processing with progress tracking
-- 🎛️ **Adjustable Settings**: Control processing intensity and iterations
-- 📊 **Before/After Comparison**: Visual comparison of original vs processed images
-- 🌓 **Modern UI**: Beautiful interface with dark/light mode support
-- 🔒 **Privacy Focused**: All processing happens locally, no data sent to external services
+- **Image Processing**: Advanced filtering algorithms to modify AI-generated images
+- **Adjustable Settings**: Control processing intensity and iterations
+- **Privacy Focused**: All processing happens locally, no data sent to external services
 
 ## Technology Stack
 
