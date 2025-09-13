@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Upload, Download, Zap, Shield, Image as ImageIcon, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import SpotlightCard from '@/components/SpotlightCard'
+import { processImage } from '@/lib/api'
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -37,32 +38,23 @@ export default function Home() {
     setIsProcessing(true)
     setProgress(0)
 
-    const formData = new FormData()
-    formData.append('file', selectedFile)
-    formData.append('iterations', iterations[0].toString())
-    formData.append('intensity', intensity[0].toString())
-
     try {
       // Simulate progress
       const progressInterval = setInterval(() => {
         setProgress(prev => Math.min(prev + 10, 90))
       }, 200)
 
-      const response = await fetch('http://localhost:8000/process-image', {
-        method: 'POST',
-        body: formData,
+      const blob = await processImage({
+        file: selectedFile,
+        iterations: iterations[0],
+        intensity: intensity[0],
       })
 
       clearInterval(progressInterval)
       setProgress(100)
 
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        setProcessedUrl(url)
-      } else {
-        console.error('Processing failed:', response.statusText)
-      }
+      const url = URL.createObjectURL(blob)
+      setProcessedUrl(url)
     } catch (error) {
       console.error('Error processing image:', error)
     } finally {
@@ -72,10 +64,17 @@ export default function Home() {
   }
 
   const handleDownload = () => {
-    if (processedUrl) {
+    if (processedUrl && selectedFile) {
       const link = document.createElement('a')
       link.href = processedUrl
-      link.download = 'de-aified-image.png'
+      
+      // Get the original filename without extension
+      const originalName = selectedFile.name
+      const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName
+      const extension = originalName.substring(originalName.lastIndexOf('.')) || '.png'
+      
+      // Create new filename with deaified_ prefix
+      link.download = `deaified_${nameWithoutExt}${extension}`
       link.click()
     }
   }
@@ -136,6 +135,53 @@ export default function Home() {
                           <div>
                             <h4 className="font-semibold text-white mb-1">Bypass Detection Systems</h4>
                             <p>Specifically designed to fool AI detection systems like SightEngine, reducing detection rates from 100% to 2-5%.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="text-neutral-300 hover:text-primary transition-colors duration-300 cursor-pointer px-3 py-2 rounded-lg">
+                    Privacy
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="rounded-2xl border-white/20 bg-black/50 backdrop-blur-lg p-0 overflow-hidden">
+                    <div className="p-6 space-y-4">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-bold text-white">Privacy & Security</DialogTitle>
+                        <DialogDescription className="text-gray-300">
+                          Your privacy is our priority - no images are stored
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 text-sm text-gray-300 mt-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">No Image Storage</h4>
+                            <p>Your images are processed in real-time and immediately discarded. We never store, save, or keep any copies of your uploaded images.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">Temporary Processing</h4>
+                            <p>Images exist in server memory only during processing (typically 1-5 seconds) and are automatically cleared when processing completes.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">No Data Collection</h4>
+                            <p>We don&apos;t collect, analyze, or store any metadata about your images. No EXIF data, filenames, or image content is retained.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">Secure Processing</h4>
+                            <p>All image processing happens on secure servers with encrypted connections (HTTPS). Your images are never transmitted to third parties.</p>
                           </div>
                         </div>
                       </div>
@@ -253,6 +299,53 @@ export default function Home() {
               <Dialog>
                 <DialogTrigger asChild>
                   <button className="text-neutral-300 hover:text-primary justify-start transition-colors duration-300 cursor-pointer px-3 py-2 rounded-lg w-full text-left">
+                    Privacy
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="rounded-2xl border-white/20 bg-black/50 backdrop-blur-lg p-0 overflow-hidden">
+                    <div className="p-6 space-y-4">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-bold text-white">Privacy & Security</DialogTitle>
+                        <DialogDescription className="text-gray-300">
+                          Your privacy is our priority - no images are stored
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 text-sm text-gray-300 mt-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">No Image Storage</h4>
+                            <p>Your images are processed in real-time and immediately discarded. We never store, save, or keep any copies of your uploaded images.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">Temporary Processing</h4>
+                            <p>Images exist in server memory only during processing (typically 1-5 seconds) and are automatically cleared when processing completes.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">No Data Collection</h4>
+                            <p>We don&apos;t collect, analyze, or store any metadata about your images. No EXIF data, filenames, or image content is retained.</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-white mb-1">Secure Processing</h4>
+                            <p>All image processing happens on secure servers with encrypted connections (HTTPS). Your images are never transmitted to third parties.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="text-neutral-300 hover:text-primary justify-start transition-colors duration-300 cursor-pointer px-3 py-2 rounded-lg w-full text-left">
                     Contact
                   </button>
                 </DialogTrigger>
@@ -268,7 +361,7 @@ export default function Home() {
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0" />
                           <a 
-                            href="https://github.com/yourusername" 
+                            href="https://github.com/zendrix396" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-white hover:text-primary transition-colors duration-300 cursor-pointer flex items-center gap-2"
@@ -280,7 +373,7 @@ export default function Home() {
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0" />
                           <a 
-                            href="https://twitter.com/yourusername" 
+                            href="https://twitter.com/zendrix396" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-white hover:text-primary transition-colors duration-300 cursor-pointer flex items-center gap-2"
