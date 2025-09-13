@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Response
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from PIL import Image, ImageFilter
@@ -7,12 +7,19 @@ import io
 import os
 from typing import Optional
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="De-AIfy Image Processor", version="1.0.0")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["https://deaify.vercel.app"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,7 +107,9 @@ async def health_check():
     return {"status": "healthy"}
 
 @app.post("/process-image")
+@limiter.limit("20/minute")
 async def process_image(
+    request: Request,
     file: UploadFile = File(...),
     iterations: int = Form(default=1),
     intensity: float = Form(default=1.0)
@@ -159,7 +168,8 @@ async def process_image(
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
 
 @app.post("/analyze-image")
-async def analyze_image(file: UploadFile = File(...)):
+@limiter.limit("20/minute")
+async def analyze_image(request: Request, file: UploadFile = File(...)):
     """
     Analyze an image and return basic information.
     
