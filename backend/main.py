@@ -16,10 +16,12 @@ app = FastAPI(title="De-AIfy Image Processor", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://deaify.vercel.app"],  # Allow all origins
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -140,6 +142,8 @@ async def process_image(
     try:
         # Read the uploaded image
         image_data = await file.read()
+        if len(image_data) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=413, detail=f"File size exceeds the limit of 10MB")
         image = Image.open(io.BytesIO(image_data))
         
         # Process the image
@@ -186,6 +190,8 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     try:
         # Read the uploaded image
         image_data = await file.read()
+        if len(image_data) > MAX_FILE_SIZE:
+            raise HTTPException(status_code=413, detail=f"File size exceeds the limit of 10MB")
         image = Image.open(io.BytesIO(image_data))
         
         # Get image information
