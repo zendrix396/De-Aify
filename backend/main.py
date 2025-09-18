@@ -6,7 +6,7 @@ import numpy as np
 import io
 import os
 from typing import Optional
-
+from mangum import Mangum
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -211,6 +211,9 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error analyzing image: {str(e)}")
+
+handler = Mangum(app)
+
 
 if __name__ == "__main__":
     import uvicorn

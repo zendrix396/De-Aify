@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://deaify.zendrix.dev'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://8a7omfqqf8.execute-api.ap-south-1.amazonaws.com'
 
 export interface ProcessImageParams {
   file: File

@@ -1,0 +1,15 @@
+# serverless.yml for deaify
+
+service: deaify-docker
+
+provider:
+  name: aws
+  region: ap-south-1 # Or your preferred region
+
+functions:
+  api:
+    # We will build and push the image manually, then reference it here
+    # You will fill this in after pushing the image to ECR
+    image: 315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify:latest
+    events:
+      - httpApi: '*'
