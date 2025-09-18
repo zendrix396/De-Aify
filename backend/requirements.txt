@@ -1,7 +1,7 @@
 fastapi
-numpy
 Pillow
-uvicorn
-slowapi
+numpy
 mangum
+slowapi
+uvicorn
 python-multipart
