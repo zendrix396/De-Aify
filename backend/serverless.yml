@@ -12,6 +12,7 @@ functions:
   api:
     # We will build and push the image manually, then reference it here
     image: 315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify:latest
+    memorySize: 2048
     events:
       - httpApi: '*'
-    timeout: 30
+    timeout: 60

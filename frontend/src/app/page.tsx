@@ -17,7 +17,7 @@ export default function Home() {
   const [processedUrl, setProcessedUrl] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [iterations, setIterations] = useState([3])
+  const [iterations, setIterations] = useState([2])
   const [intensity, setIntensity] = useState([1.0])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)

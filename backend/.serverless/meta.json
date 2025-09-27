@@ -105,12 +105,12 @@
               "Type": "AWS::Lambda::Function",
               "Properties": {
                 "Code": {
-                  "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+                  "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
                 },
                 "PackageType": "Image",
                 "FunctionName": "deaify-docker-dev-api",
-                "MemorySize": 1024,
-                "Timeout": 30,
+                "MemorySize": 2048,
+                "Timeout": 60,
                 "Role": {
                   "Fn::GetAtt": [
                     "IamRoleLambdaExecution",
@@ -122,14 +122,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8": {
+            "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+                "CodeSha256": "7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
               }
             },
             "HttpApi": {
@@ -262,7 +262,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8"
+                "Ref": "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw"
               },
               "Export": {
                 "Name": "sls-deaify-docker-dev-ApiLambdaFunctionQualifiedArn"
@@ -309,18 +309,19 @@
       "functions": {
         "api": {
           "image": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify:latest",
+          "memorySize": 2048,
           "events": [
             {
               "httpApi": "*",
               "resolvedMethod": "ANY"
             }
           ],
-          "timeout": 30,
+          "timeout": 60,
           "name": "deaify-docker-dev-api",
           "package": {},
-          "memory": 1024,
+          "memory": 2048,
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8"
+          "versionLogicalId": "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw"
         }
       }
     },
@@ -424,12 +425,12 @@
             "Type": "AWS::Lambda::Function",
             "Properties": {
               "Code": {
-                "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+                "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
               },
               "PackageType": "Image",
               "FunctionName": "deaify-docker-dev-api",
-              "MemorySize": 1024,
-              "Timeout": 30,
+              "MemorySize": 2048,
+              "Timeout": 60,
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -441,14 +442,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8": {
+          "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+              "CodeSha256": "7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
             }
           },
           "HttpApi": {
@@ -581,7 +582,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8"
+              "Ref": "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw"
             },
             "Export": {
               "Name": "sls-deaify-docker-dev-ApiLambdaFunctionQualifiedArn"
@@ -634,7 +635,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "# serverless.yml for deaify\r\n\r\nservice: deaify-docker\r\n\r\nprovider:\r\n  name: aws\r\n  region: ap-south-1\r\n  httpApi:\r\n    cors: true\r\n\r\nfunctions:\r\n  api:\r\n    # We will build and push the image manually, then reference it here\r\n    image: 315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify:latest\r\n    events:\r\n      - httpApi: '*'\r\n    timeout: 30\r\n",
+    "serviceRawFile": "# serverless.yml for deaify\r\n\r\nservice: deaify-docker\r\n\r\nprovider:\r\n  name: aws\r\n  region: ap-south-1\r\n  httpApi:\r\n    cors: true\r\n\r\nfunctions:\r\n  api:\r\n    # We will build and push the image manually, then reference it here\r\n    image: 315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify:latest\r\n    memorySize: 2048\r\n    events:\r\n      - httpApi: '*'\r\n    timeout: 60\r\n",
     "command": [
       "deploy"
     ],
@@ -647,12 +648,12 @@
     "serviceProviderAwsCfStackName": "deaify-docker-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:ap-south-1:315836106509:stack/deaify-docker-dev/4b98e840-94bc-11f0-9a7d-0211ea52cf61",
     "serviceProviderAwsCfStackCreated": "2025-09-18T18:21:30.037Z",
-    "serviceProviderAwsCfStackUpdated": "2025-09-18T19:34:37.071Z",
+    "serviceProviderAwsCfStackUpdated": "2025-09-27T07:08:59.385Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:ap-south-1:315836106509:function:deaify-docker-dev-api:6",
+        "OutputValue": "arn:aws:lambda:ap-south-1:315836106509:function:deaify-docker-dev-api:9",
         "Description": "Current Lambda function version",
         "ExportName": "sls-deaify-docker-dev-ApiLambdaFunctionQualifiedArn"
       },
@@ -766,12 +767,12 @@
           "Type": "AWS::Lambda::Function",
           "Properties": {
             "Code": {
-              "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+              "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
             },
             "PackageType": "Image",
             "FunctionName": "deaify-docker-dev-api",
-            "MemorySize": 1024,
-            "Timeout": 30,
+            "MemorySize": 2048,
+            "Timeout": 60,
             "Role": {
               "Fn::GetAtt": [
                 "IamRoleLambdaExecution",
@@ -783,14 +784,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8": {
+        "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+            "CodeSha256": "7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
           }
         },
         "HttpApi": {
@@ -922,7 +923,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8"
+            "Ref": "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw"
           },
           "Export": {
             "Name": "sls-deaify-docker-dev-ApiLambdaFunctionQualifiedArn"

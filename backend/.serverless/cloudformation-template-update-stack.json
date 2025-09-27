@@ -90,12 +90,12 @@
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
-          "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+          "ImageUri": "315836106509.dkr.ecr.ap-south-1.amazonaws.com/deaify@sha256:7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
         },
         "PackageType": "Image",
         "FunctionName": "deaify-docker-dev-api",
-        "MemorySize": 1024,
-        "Timeout": 30,
+        "MemorySize": 2048,
+        "Timeout": 60,
         "Role": {
           "Fn::GetAtt": [
             "IamRoleLambdaExecution",
@@ -107,14 +107,14 @@
         "ApiLogGroup"
       ]
     },
-    "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8": {
+    "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ApiLambdaFunction"
         },
-        "CodeSha256": "57bb8f23800a9a0467e634195e50962abf70b6bd9962c289970831fe788100d1"
+        "CodeSha256": "7f90c627143c82fd8f053e42944f5b4011f6323588c0c80808c4fa820d9c0b53"
       }
     },
     "HttpApi": {
@@ -246,7 +246,7 @@
     "ApiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ApiLambdaVersion3rUbfG4PTpGsUtchYNYugqhAOgv5Bf5LnwHfU91iG8"
+        "Ref": "ApiLambdaVersionrlcFk746JbcozBmSOj9WanxczJ4XrgCNlwOAd5LHqTw"
       },
       "Export": {
         "Name": "sls-deaify-docker-dev-ApiLambdaFunctionQualifiedArn"

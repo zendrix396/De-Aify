@@ -18,6 +18,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
