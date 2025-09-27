@@ -39,21 +39,82 @@ export async function processImage({
   formData.append('iterations', iterations.toString())
   formData.append('intensity', intensity.toString())
 
-  const response = await fetch(`${API_BASE_URL}/process-image`, {
-    method: 'POST',
-    body: formData,
-  })
+  console.log('Making request to:', `${API_BASE_URL}/process-image`)
+  console.log('File:', file.name, 'Size:', file.size, 'Type:', file.type)
+  console.log('Iterations:', iterations, 'Intensity:', intensity)
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new ApiError(
-      `Failed to process image: ${errorText}`,
-      response.status,
-      response
-    )
+  // Add retry logic for 503 errors
+  const maxRetries = 3
+  let lastError: Error | null = null
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Attempt ${attempt}/${maxRetries}`)
+      
+      const response = await fetch(`${API_BASE_URL}/process-image`, {
+        method: 'POST',
+        body: formData,
+        // Add a longer timeout for image processing
+        signal: AbortSignal.timeout(120000), // 2 minutes
+      })
+
+      console.log('Response status:', response.status)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
+      if (!response.ok) {
+        let errorText = ''
+        try {
+          errorText = await response.text()
+        } catch {
+          errorText = `HTTP ${response.status} ${response.statusText}`
+        }
+        console.error('Error response:', errorText)
+        console.error('Response status:', response.status)
+        console.error('Response statusText:', response.statusText)
+        
+        // Handle specific error cases
+        if (response.status === 503) {
+          if (attempt < maxRetries) {
+            console.log(`503 error on attempt ${attempt}, retrying in ${attempt * 2} seconds...`)
+            await new Promise(resolve => setTimeout(resolve, attempt * 2000))
+            continue
+          }
+          throw new ApiError(
+            'Service temporarily unavailable. Please try again in a moment.',
+            response.status,
+            response
+          )
+        } else if (response.status === 429) {
+          throw new ApiError(
+            'Rate limit exceeded. Please wait a moment before trying again.',
+            response.status,
+            response
+          )
+        }
+        
+        throw new ApiError(
+          `Failed to process image: ${errorText}`,
+          response.status,
+          response
+        )
+      }
+
+      return response.blob()
+    } catch (error) {
+      lastError = error as Error
+      console.error(`Attempt ${attempt} failed:`, error)
+      
+      if (attempt < maxRetries && error instanceof ApiError && error.status === 503) {
+        console.log(`Retrying in ${attempt * 2} seconds...`)
+        await new Promise(resolve => setTimeout(resolve, attempt * 2000))
+        continue
+      }
+      
+      throw error
+    }
   }
 
-  return response.blob()
+  throw lastError || new Error('All retry attempts failed')
 }
 
 export async function analyzeImage(file: File): Promise<ImageAnalysis> {
@@ -78,15 +139,23 @@ export async function analyzeImage(file: File): Promise<ImageAnalysis> {
 }
 
 export async function checkApiHealth(): Promise<{ status: string }> {
-  const response = await fetch(`${API_BASE_URL}/health`)
-  
-  if (!response.ok) {
-    throw new ApiError(
-      'API health check failed',
-      response.status,
-      response
-    )
-  }
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`, {
+      method: 'GET',
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+    })
+    
+    if (!response.ok) {
+      throw new ApiError(
+        'API health check failed',
+        response.status,
+        response
+      )
+    }
 
-  return response.json()
+    return response.json()
+  } catch (error) {
+    console.error('Health check failed:', error)
+    throw error
+  }
 }

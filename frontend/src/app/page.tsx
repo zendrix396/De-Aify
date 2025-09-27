@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Upload, Download, Zap, Shield, Image as ImageIcon, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import SpotlightCard from '@/components/SpotlightCard'
-import { processImage } from '@/lib/api'
+import { processImage, checkApiHealth } from '@/lib/api'
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -17,7 +17,7 @@ export default function Home() {
   const [processedUrl, setProcessedUrl] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [iterations, setIterations] = useState([3])
+  const [iterations, setIterations] = useState([2])
   const [intensity, setIntensity] = useState([1.0])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -39,6 +39,11 @@ export default function Home() {
     setProgress(0)
 
     try {
+      // Check API health first
+      console.log('Checking API health...')
+      await checkApiHealth()
+      console.log('API health check passed')
+
       // Simulate progress
       const progressInterval = setInterval(() => {
         setProgress(prev => Math.min(prev + 10, 90))
