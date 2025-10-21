@@ -39,27 +39,18 @@ export async function processImage({
   formData.append('iterations', iterations.toString())
   formData.append('intensity', intensity.toString())
 
-  console.log('Making request to:', `${API_BASE_URL}/process-image`)
-  console.log('File:', file.name, 'Size:', file.size, 'Type:', file.type)
-  console.log('Iterations:', iterations, 'Intensity:', intensity)
-
   // Add retry logic for 503 errors
   const maxRetries = 3
   let lastError: Error | null = null
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Attempt ${attempt}/${maxRetries}`)
-      
       const response = await fetch(`${API_BASE_URL}/process-image`, {
         method: 'POST',
         body: formData,
         // Add a longer timeout for image processing
         signal: AbortSignal.timeout(120000), // 2 minutes
       })
-
-      console.log('Response status:', response.status)
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
       if (!response.ok) {
         let errorText = ''
@@ -68,14 +59,9 @@ export async function processImage({
         } catch {
           errorText = `HTTP ${response.status} ${response.statusText}`
         }
-        console.error('Error response:', errorText)
-        console.error('Response status:', response.status)
-        console.error('Response statusText:', response.statusText)
-        
         // Handle specific error cases
         if (response.status === 503) {
           if (attempt < maxRetries) {
-            console.log(`503 error on attempt ${attempt}, retrying in ${attempt * 2} seconds...`)
             await new Promise(resolve => setTimeout(resolve, attempt * 2000))
             continue
           }
@@ -102,10 +88,8 @@ export async function processImage({
       return response.blob()
     } catch (error) {
       lastError = error as Error
-      console.error(`Attempt ${attempt} failed:`, error)
       
       if (attempt < maxRetries && error instanceof ApiError && error.status === 503) {
-        console.log(`Retrying in ${attempt * 2} seconds...`)
         await new Promise(resolve => setTimeout(resolve, attempt * 2000))
         continue
       }
@@ -155,7 +139,6 @@ export async function checkApiHealth(): Promise<{ status: string }> {
 
     return response.json()
   } catch (error) {
-    console.error('Health check failed:', error)
     throw error
   }
 }

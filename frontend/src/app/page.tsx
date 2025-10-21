@@ -40,9 +40,7 @@ export default function Home() {
 
     try {
       // Check API health first
-      console.log('Checking API health...')
       await checkApiHealth()
-      console.log('API health check passed')
 
       // Simulate progress
       const progressInterval = setInterval(() => {
